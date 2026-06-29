@@ -56,15 +56,8 @@ $(function () {
                 if (param.result == 'success') {
 
                     alert('프로필 사진이 변경되었습니다.');
-
-                    // 새 사진 반영 (브라우저 캐시 방지)
-                    $('.my-photo').attr(
-                        'src',
-                        '../member/photoView?' + new Date().getTime()
-                    );
-
-                    // 파일 선택 초기화
-                    $('#upload').val('');
+					//파일 업로드 태그의 선택자, 업로드되는 이미지가 보여지는 태그 선택자
+				customInitImage('#upload', '.my-photo');
 
                 } else {
                     alert('파일 전송 오류');
