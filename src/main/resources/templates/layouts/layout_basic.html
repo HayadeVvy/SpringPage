@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html xmlns:th="www.thymeleaf.org" xmlns:layout="www.ultraq.net.nz/thymeleaf/layout">
+<head>
+<meta charset="UTF-8">
+<meta name="csrf-header" th:content="${_csrf.headerName}">
+<meta name="csrf-token" th:content="${_csrf.token}">
+<title layout:title-pattern="$LAYOUT_TITLE > $CONTENT_TITLE">Spring Page</title>
+<link rel="stylesheet" th:href="@{/assets/css/common.css}" type="text/css">
+</head>
+<body>
+<div id="main">
+	<!-- 헤더 -->
+	<div id="main_header" th:insert="fragments/header::header"></div>
+	<!-- middle content-->
+	<div id="main_body" layout:fragment="content">
+	
+	</div>
+	<!-- middle content -->
+	<div id="main_footer" th:insert="fragments/footer::footer">
+	
+	</div>
+</div>
+</body>
+</html>

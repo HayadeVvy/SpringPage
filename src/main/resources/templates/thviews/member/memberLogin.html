@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html xmlns:th="www.thymeleaf.org" xmlns:layout="www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layouts/layout_basic}">
+<head>
+<title>로그인</title>
+
+<link rel="stylesheet" th:href="@{/assets/css/member.css}" type="text/css">
+<script th:src="@{/assets/js/jquery-3.7.1.min.js}" type="text/javascript"></script>
+<script th:src="@{/assets/js/member.login.js}" type="text/javascript"></script>
+</head>
+<body>
+<div layout:fragment="content" class="page-main">
+	<h2>로그인</h2>
+	<form th:action="@{login}" id="member_login" method="post">	
+	<div class="align-center error-invalid error-color" th:if="${error == 'error'}">
+	아이디 또는 비밀번호 불일치
+	</div>
+	<div class="align-center error-invalid error-color" th:if="${error == 'error_suspended'}">
+	정지회원입니다.
+	</div>
+		<ul>
+			<li class="floating-label">
+				<input type="text" autocomplete="off" placeholder="아이디" class="form-input" id="id" name="id">
+				<label for="id">아이디</label>
+				<div id="error_id" class="error-color"></div>
+			</li>
+			<li class="floating-label">
+				
+				<input type="password" id="passwd"  name="passwd"  class="form-input" autocomplete="off">
+				<label for="passwd">비밀번호</label>
+				<div id="error_passwd" class="error-color"></div>
+			</li>
+			<li>
+				<label for="remember-me">
+					<input type="checkbox" name="remember-me" id="remember-me">로그인 상태 유지
+				</label>
+			</li>
+		</ul>
+		<div class="align-center">
+			<input type="submit" class="default-btn" value="로그인">
+			<input type="button" value="홈으로" class="default-btn" th:onclick="|location.href='@{/main.home}'|">
+		</div>
+	</form>
+</div>
+</body>
+</html>

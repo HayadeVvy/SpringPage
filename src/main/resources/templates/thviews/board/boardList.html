@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html xmlns:th="www.thymeleaf.org" 
+xmlns:sec="www.thymeleaf.org/extras/spring-security"
+xmlns:layout="www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layouts/layout_basic}">
+<head>
+<meta charset="UTF-8">
+<title>게시판 목록</title>
+</head>
+<body>
+<div layout:fragment="content" class="page-main">
+	<h2>게시판 목록</h2>
+	<div class="align-right">
+		<input type="button" value="글쓰기" sec:authorize="isAuthenticated()" onclick="location.href='write'">
+	</div>
+</div>
+</body>
+</html>

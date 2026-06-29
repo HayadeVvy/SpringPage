@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8" ?>  
+<!DOCTYPE mapper   
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"   
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">  
+<mapper namespace="kr.spring.member.dao.MemberMapper"> 
+	<!-- 회원 가입 -->
+	<insert id="insertMemberDetail" parameterType="memberVO">
+		insert into spmember_detail(
+			mem_num, name, passwd, phone, email, zipcode, address1,address2
+		)
+		values
+		(
+			#{mem_num}, #{name} ,#{passwd}, #{phone}, #{email}, #{zipcode}, #{address1}, #{address2}
+		)
+		
+	</insert>
+	
+	<!-- 아이디, 닉네임 중복 체크 -->
+	<select id="selectIdAndNickName" parameterType="map" resultType="memberVO">
+		select * from spmember where
+		<if test="id != null and id != ''">
+			id= #{id}
+		</if>
+		<if test="nick_name != null and nick_name != ''">
+			nick_name= #{nick_name}
+		</if>
+	</select>
+	
+	<!-- 로그인 처리 -->
+	<select id="selectCheckMember" parameterType="string" resultType="memberVO">
+		select mem_num,id,authority, nick_name, passwd, email from spmember join spmember_detail using (mem_num)
+		where id = #{id}
+	
+	</select>
+	
+	
+	<!-- 회원 디테일 수정 -->
+	<update id="updateMemberDetail" parameterType="memberVO">
+		update spmember_detail set 
+		name = #{name}, phone =#{phone}, email= #{email}, zipcode=#{zipcode}, address1=#{address1}, address2=#{address2}, modify_date=sysdate where mem_num=#{mem_num}
+	
+	</update>
+</mapper>
+
+
+
+
+
+
+
