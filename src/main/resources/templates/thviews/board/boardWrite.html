@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html xmlns:th="www.thymeleaf.org" 
+xmlns:layout="www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layouts/layout_basic}">
+<head>
+<title>게시판 글쓰기</title>
+<link rel="stylesheet" th:href="@{/assets/css/board.css}"> 
+<link href="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/summernote@0.9.0/dist/summernote.min.css" rel="stylesheet">
+<script th:src="@{/assets/js/jquery-3.7.1.min.js}"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/summernote@0.9.0/dist/summernote.min.js"></script>
+<script>
+ $(function(){
+	 $('#content').summernote({
+		height: 300 
+		 
+	 });
+	 
+	 $('#board_register').submit(function(){
+		 if($('#content').val()=='<p><br></p>'){
+			 $('#content').val('');
+		 }
+		 //주의 - summernote를 사용할 경우 javascript
+		 //파일 용량 체크할것
+		 //서버 사이드 용량 체크시 폼으로 되돌아오면 내용 입력 부분이 사라짐  
+		 const fileSize = 1024 * 1024;
+		 const myFile = $('#upload')[0].files[0];
+		 if(myFile && myFile.size > fileSize)
+			 {
+			 	alert(myFile.size + 'bytes(' +fileSize + 'bytes까지만 업로드 가능)')
+			 	return false;
+			 }
+	 });
+ })
+</script>
+</head>
+<body>
+<div layout:fragment="content" class="page-main">
+	<h2>게시판 글쓰기</h2>
+	<form th:action="@{write}" id="board_register" enctype="multipart/form-data" method="post" th:object="${boardVO}">
+		<ul>
+			<li>
+				<input type="text" th:field="*{title}" placeholder="제목을 입력하세요">
+				<span th:errors="*{title}" class="error-color"></span>
+			</li>
+			<li>
+				<textarea th:field="*{content}"></textarea>
+				<span th:errors="*{content}" class="error-color"></span>
+			</li>
+			<li>
+				<label>파일 업로드</label>
+				<input type="file" name="upload" id="upload">
+			</li>
+		</ul>	
+		<div class="align-center" >
+			<input type="submit" class="defaut-btn" value="전송">
+			<input type="button" class="default-btn" value="목록" onclick="location.href='list'">
+		</div>
+	</form>
+</div>
+</body>
+</html>

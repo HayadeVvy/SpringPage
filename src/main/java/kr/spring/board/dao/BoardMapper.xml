@@ -3,7 +3,11 @@
     PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"   
     "http://mybatis.org/dtd/mybatis-3-mapper.dtd">  
 <mapper namespace="kr.spring.board.dao.BoardMapper"> 
-	
+	<!-- 게시판 글 등록 -->
+	<insert id="insertBoard" parameterType="boardVO">
+		insert into spboard(board_num,title,content,filename,ip,mem_num) values
+		(spboard_seq.nextval, #{title}, #{content}, #{filename, jdbcType=VARCHAR}, #{ip}, #{mem_num})
+	</insert>
 </mapper>
 
 

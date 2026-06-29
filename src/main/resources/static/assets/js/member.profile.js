@@ -58,6 +58,8 @@ $(function () {
                     alert('프로필 사진이 변경되었습니다.');
 					//파일 업로드 태그의 선택자, 업로드되는 이미지가 보여지는 태그 선택자
 				customInitImage('#upload', '.my-photo');
+				$('#photo_choice').hide();
+				$('#photo_btn').show();
 
                 } else {
                     alert('파일 전송 오류');
@@ -78,9 +80,10 @@ $(function () {
     // 취소 버튼
     // ==========================
     $('#photo_reset').click(function () {
-
-        $('#upload').val('');
-
+		//파일 업로드 태그의 선택자, 업로드 되는 이미지가 보여지는 태그 선택자
+		customCancelImage('#upload','.my-photo');
+        $('#photo_choice').hide();
+		$('#photo_btn').show();	
     });
 
 });
