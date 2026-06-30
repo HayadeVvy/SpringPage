@@ -3,11 +3,59 @@
     PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"   
     "http://mybatis.org/dtd/mybatis-3-mapper.dtd">  
 <mapper namespace="kr.spring.board.dao.BoardMapper"> 
+
+	<resultMap type="boardVO" id="boardMap">
+		<result property="memberVO.id" column ="id"/>
+		<result property="memberVO.nick_name" column = "nick_name"/>
+	</resultMap>
+
 	<!-- 게시판 글 등록 -->
 	<insert id="insertBoard" parameterType="boardVO">
 		insert into spboard(board_num,title,content,filename,ip,mem_num) values
 		(spboard_seq.nextval, #{title}, #{content}, #{filename, jdbcType=VARCHAR}, #{ip}, #{mem_num})
 	</insert>
+	
+	<!-- sql태그와 include태그를 이용해 sql문을 재사용 -->
+	<!-- 검색 -->
+	<sql id="boardSearch">
+		<where>
+			<if test="keyword != null and keyword != ''">
+				<if test="keyfield == 1">
+					title like '%' || #{keyword} || '%'
+				</if>
+				<if test="keyfield == 2">
+					id like '%' || #{keyword} || '%' or
+					nick_name like '%' || #{keyword} || '%'
+				</if>
+				<if test="keyfield == 3">
+					content like '%' || #{keyword} || '%'
+				</if>
+				<if test="keyfield == 4">
+					title like '%' || #{keyword} || '%' or 	content like '%' || #{keyword} || '%'
+				</if>
+			</if>
+		</where>
+	</sql>
+	
+	<!-- 게시판 전체 또는 검색 레코드수  -->
+	<select id="selectRowCount" parameterType="map" resultType="integer">
+		select count(*) from spboard join spmember using (mem_num)
+		<include refid="boardSearch"/>
+	</select>
+	
+	<!-- 게시판 전체/검색 목록 -->
+	<select id="selectList" parameterType="map" resultMap="boardMap">
+		<![CDATA[
+		select board_num, replace(replace(title, '<', '&lt;'), '>', '&gt;') title,
+		]]>
+		hit, filename, reg_date, mem_num, id, nick_name
+		from spboard 
+		join spmember using(mem_num)
+		<include refid="boardSearch"/>
+		order by board_num desc 
+		offset #{skip} rows Fetch next #{limit} rows only
+	</select>
+	
 </mapper>
 
 

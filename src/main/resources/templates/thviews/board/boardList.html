@@ -4,13 +4,55 @@ xmlns:sec="www.thymeleaf.org/extras/spring-security"
 xmlns:layout="www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layouts/layout_basic}">
 <head>
 <title>게시판 목록</title>
+<link rel="stylesheet" th:href="@{/assets/css/board.css}" type="text/css">
+<script th:src="@{/assets/js/jquery-3.7.1.min.js}"></script>
 </head>
 <body>
 <div layout:fragment="content" class="page-main">
 	<h2>게시판 목록</h2>
+	<form action="list" id="search_form" method="get">
+		<ul class="search">
+			<li>
+				<select name="keyfield" id="keyfield">
+					<option value="1" th:selected="${keyfield == '1'}">제목</option>
+					<option value="2" th:selected="${keyfield == '2'}">ID+별명</option>
+					<option value="3" th:selected="${keyfield == '3'}">내용</option>
+					<option value="4" th:selected="${keyfield == '4'}">제목+내용</option>
+					
+				</select>
+			</li>
+			<li>
+				<input type="search" name="keyword" id="keyword" th:value="${keyword}">
+			</li>
+			<li>
+				<input type="submit" value="찾기" >
+				<input type="button" value="목록" onclick="location.href='list'">
+			</li>
+		</ul>
+	</form>
 	<div class="align-right">
 		<input type="button" value="글쓰기" sec:authorize="isAuthenticated()" onclick="location.href='write'">
 	</div>
+	<div th:if="${count == 0}" class="result-display">표시할 게시물이 없습니다.</div>
+	<th:block th:if="${count > 0}">
+		<table class="striped-table">
+			<tr>
+				<th>번호</th>
+				<th width="400">제목</th>
+				<th>작성자</th>
+				<th>작성일</th>
+				<th>조회수</th>
+			</tr>
+			<tr th:each="board : ${list}">
+				<td class="align-center" th:text="${board.board_num}"></td>
+				<td class="align-left" ><a th:href="@{/board/detail(board_num=${board.board_num})}">[[${board.title}]]</a></td>
+				<td class="align-center" th:text="${board.memberVO.userName}"></td>
+				<td class="align-center" th:text="${board.reg_date}"></td>
+				<td class="align-center" th:text="${board.hit}"></td>
+			</tr>
+		</table>
+		<div class="align-center" th:utext="${page}"></div>
+	</th:block>
 </div>
 </body>
 </html>

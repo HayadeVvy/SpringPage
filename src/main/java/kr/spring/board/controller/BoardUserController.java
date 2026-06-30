@@ -1,6 +1,10 @@
 package kr.spring.board.controller;
 
+import java.io.File;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -12,6 +16,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
@@ -19,6 +24,8 @@ import kr.spring.board.service.BoardService;
 import kr.spring.board.vo.BoardVO;
 import kr.spring.member.vo.PrincipalDetails;
 import kr.spring.util.FileUtil;
+import kr.spring.util.PagingUtil;
+import kr.spring.util.StringUtil;
 import kr.spring.util.ValidationUtil;
 import lombok.extern.slf4j.Slf4j;
 
@@ -78,10 +85,75 @@ public class BoardUserController {
 	
 	//게시판 목록
 	@GetMapping("/list")
-	public String getList()
+	public String getList(
+			@RequestParam(defaultValue ="1")int pageNum, String keyfield, String keyword, Model model)
 	{
+		Map<String,Object> map = new HashMap<>();
+		
+		map.put("keyfield", keyfield);
+		map.put("keyword", keyword);
+		
+		//전체 레코드 수
+		int count = boardService.selectRowCount(map);
+	
+		//페이지 처리
+		PagingUtil page = new PagingUtil(keyfield, keyword, pageNum, count, 20, 10 , "list");
+		
+		List<BoardVO> list = null;
+		
+		if(count > 0)
+		{
+			map.put("skip", page.getSkip());
+			map.put("limit", page.getLimit());
+			
+			list = boardService.selectList(map);
+		}
+		
+		model.addAttribute("count", count);
+		model.addAttribute("list", list);
+		model.addAttribute("page", page.getPage());
+		model.addAttribute("keyfield", keyfield);
+		model.addAttribute("keyword", keyword);
+		
 		return "thviews/board/boardList";
 	}
 	
+	@GetMapping("/detail")
+	public String process(long board_num, Model model)
+	{
+		log.debug("<<글상세 - board_num>> :" + board_num);
+		
+		//해당글 조회수 증가
+		boardService.updateHit(board_num);
+		
+		BoardVO board = boardService.selectBoard(board_num);
+		
+		//제목의 태그를 혀용하지 않음
+		board.setTitle(StringUtil.useNoHtml(board.getTitle()));
+		
+		model.addAttribute("board", board);
+		
+		
+		return "thviews/board/boardView";
+	}
 	
+	
+	//파일 다운로드
+	@GetMapping("/file")
+	public String download(long board_num, HttpServletRequest request, Model model)
+	{
+		
+		BoardVO board = boardService.selectBoard(board_num);
+		
+		//컨택스트 경로상의 절대경로 구하기
+		
+		String path = request.getServletContext().getRealPath("/assets/upload") + "/" + board.getFilename();
+		
+		File downloadFile = new File(path);
+		
+		model.addAttribute("downloadFile", downloadFile);
+		model.addAttribute("filename", board.getFilename());
+		
+		return "downloadView";
+	}
 }

@@ -107,4 +107,10 @@ public class PagingUtil {
 	public int getEndRow() {
 		return endRow;
 	}
+	public int getSkip() {
+		return startRow - 1; 
+	}
+	public int getLimit() {
+		return endRow - startRow + 1;
+	}
 }
