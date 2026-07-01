@@ -41,7 +41,7 @@ public class BoardServiceImpl implements BoardService {
 
 	@Override
 	public void updateHit(Long board_num) {
-		// TODO Auto-generated method stub
+		boardMapper.updateHit(board_num);
 		
 	}
 
@@ -59,7 +59,7 @@ public class BoardServiceImpl implements BoardService {
 
 	@Override
 	public void deleteFile(Long board_num) {
-		// TODO Auto-generated method stub
+		boardMapper.deleteFile(board_num);
 		
 	}
 

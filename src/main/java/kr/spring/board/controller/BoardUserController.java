@@ -156,4 +156,25 @@ public class BoardUserController {
 		
 		return "downloadView";
 	}
+	
+	//수정 폼
+	@PreAuthorize("isAuthenticated()")
+	@GetMapping("/update")
+	public String formUpdate(long board_num, Model model, @AuthenticationPrincipal PrincipalDetails principal)
+	{
+		BoardVO board = boardService.selectBoard(board_num);
+		
+		//로그인한 회원번호와 작성자 회원번호 일치여부 체크
+		if(principal.getMemberVO().getMem_num() != board.getMem_num())
+		{
+			//로그인한 회원번호와 작성자 회원번호 불일치
+			return "thviews/common/accessDenied";
+		
+		}
+		
+		model.addAttribute("boardVO", board);
+		
+		
+		return "thviews/board/boardModify";
+	}
 }
