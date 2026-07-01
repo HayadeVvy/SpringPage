@@ -1,0 +1,127 @@
+package kr.spring.board.controller;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import jakarta.servlet.http.HttpServletRequest;
+import kr.spring.board.service.BoardService;
+import kr.spring.board.vo.BoardFavVO;
+import kr.spring.board.vo.BoardVO;
+import kr.spring.member.vo.PrincipalDetails;
+import kr.spring.util.FileUtil;
+import lombok.extern.slf4j.Slf4j;
+
+@RestController
+@Slf4j
+@RequestMapping("/board")
+public class BoardRestController {
+
+	@Autowired
+	private BoardService service;
+	
+	//부모글 업로드 파일 삭제
+	@DeleteMapping("/deleteFile/{board_num}")
+	public ResponseEntity<Map<String,String>> processFile(@PathVariable long board_num, @AuthenticationPrincipal PrincipalDetails principal, HttpServletRequest request)
+	{
+		// {}: 로그 출력용 자리 표시자(placeholder)
+		//예: log.debug("회원번호 : {}, 글번호 : {}, mem_num, board_num")
+		log.debug("<<파일 삭제>> : {}", board_num);
+		Map<String,String> mapAjax = new HashMap<String,String>();
+		
+		
+		BoardVO db_board = service.selectBoard(board_num);
+		
+		//로그인한 회원 번호와 작성자 회원번로 일치 여부 체크
+		
+		if(principal.getMemberVO().getMem_num() != db_board.getMem_num())
+		{
+			//불일치
+			mapAjax.put("result", "wrongAccess");
+		}
+		else
+		{
+			service.deleteFile(board_num);
+			FileUtil.removeFile(request,db_board.getFilename());
+			
+			mapAjax.put("result", "success");		
+		}
+		
+		return new ResponseEntity<Map<String,String>>(mapAjax, HttpStatus.OK);
+	}
+	
+	//부모글 좋아요 - 읽기
+	
+	@GetMapping("/getFav/{board_num}")
+	public ResponseEntity<Map<String,Object>> getFav(@PathVariable long board_num, @AuthenticationPrincipal PrincipalDetails principal)
+	{
+		log.debug("<<게시판 좋아요>> board_num: {}" + board_num );
+		
+		Map<String,Object> mapAjax = new HashMap<String,Object>();
+		BoardFavVO fav = new BoardFavVO();
+		
+		fav.setBoard_num(board_num);
+		if(principal == null)
+		{
+			//로그인 안되있는 경우
+			mapAjax.put("status", "noFav");
+		}
+		else
+		{
+			//로그인 되어 있는 경우
+			fav.setMem_num(principal.getMemberVO().getMem_num());
+			BoardFavVO boardFav = service.selectFav(fav);
+			
+			if(boardFav != null)
+			{
+				mapAjax.put("status", "yesFav");
+			}
+			else
+			{
+				mapAjax.put("status", "noFav");
+			}
+			
+		}
+		
+		mapAjax.put("count", service.selectFavCount(fav.getBoard_num()));
+		
+		return new ResponseEntity<Map<String,Object>>(mapAjax, HttpStatus.OK);
+	}
+	
+	//부모글 좋아요 등록및 삭제
+	@PostMapping("/writeFav")
+	public ResponseEntity<Map<String,Object>> writeFav(@RequestBody BoardFavVO fav, @AuthenticationPrincipal PrincipalDetails principal)
+	{
+		log.debug("<<게시판 좋아요 - 등록>>: {}", fav);
+		
+		Map<String,Object> mapAjax = new HashMap<>();
+		
+		//서버로 보낸 데이터
+		if(principal == null)
+		{
+			mapAjax.put("result", "logout");
+		}
+		else
+		{
+			//로그인한 회원번호를 boardFAV에 세팅
+			fav.setMem_num(principal.getMemberVO().getMem_num());
+			
+			BoardFavVO boardFav = service.selectFav(fav);
+		}
+		
+		return new ResponseEntity<Map<String,Object>>(mapAjax,HttpStatus.OK);
+	}
+	
+	
+}

@@ -177,4 +177,81 @@ public class BoardUserController {
 		
 		return "thviews/board/boardModify";
 	}
+	
+	//게시글 수정
+	@PreAuthorize("isAuthenticated")
+	@PostMapping("/update")
+	public String submitUpdate(@Valid BoardVO boardVO, BindingResult result, HttpServletRequest request, Model model, @AuthenticationPrincipal PrincipalDetails principal) throws IOException, IllegalStateException
+	{
+		//DB에 저장된 파일 정보 구하기
+		BoardVO db_board = boardService.selectBoard(boardVO.getBoard_num());
+		
+		//로그인한 회원번호롸 작성자 회원번호 일치여부 체크
+		if(principal.getMemberVO().getMem_num() != db_board.getMem_num())
+		{
+			return "thviews/common/accessDenied";
+		}
+		
+		//유효성 체크 결과, 오류 체크
+		if(result.hasErrors())
+		{
+			ValidationUtil.printErrorFields(result);
+			//타이틀 또는 컨텐츠가 입력되지 않아서 유효성 체크에 걸리면, 파일 정보를 잃어버리기 때문에 
+			boardVO.setFilename(db_board.getFilename());
+			return "thviews/board/boardModify";
+		}
+		
+		//파일명 세팅(FileUtil.createFile에서 파일이 없으면 null반환)
+		boardVO.setFilename(FileUtil.createFile(request, boardVO.getUpload()));
+		
+		//ip세팅
+		boardVO.setIp(request.getRemoteAddr());
+		
+		//글 수정
+		boardService.updateBoard(boardVO);
+		
+		//전에 있던 파일 삭제
+		if(boardVO.getUpload() != null && !boardVO.getUpload().isEmpty())
+		{
+			//수정전 파일 삭제 처리
+			FileUtil.removeFile(request, db_board.getFilename());
+			
+		
+		}
+		
+		model.addAttribute("message", "글 수정 완료");
+		model.addAttribute("url", request.getContextPath() + "/board/detail?board_num="  + boardVO.getBoard_num());
+		
+		return "thviews/common/resultAlert";
+	}
+	
+	//게시글 삭제
+	@PreAuthorize("isAuthenticated()")
+	@GetMapping("/delete")
+	public String submitDelete(long board_num, HttpServletRequest request, @AuthenticationPrincipal PrincipalDetails principal)
+	{
+		
+		log.debug("<<게시글 삭제>> board_num : {}", board_num);
+		
+		//DB에서 정보 읽기
+		BoardVO db_board = boardService.selectBoard(board_num);
+		
+		//로그인한 회원번호와 작성자 회원번호 일치여부 체크
+		
+		if(principal.getMemberVO().getMem_num() != db_board.getMem_num())
+		{
+			return "thviews/common/accessDenied";
+		}
+		
+		//글삭제
+		boardService.deleteBoard(board_num);
+		
+		if(db_board.getFilename() != null)
+		{
+			FileUtil.removeFile(request, db_board.getFilename());
+		}
+		
+		return "redirect:/board/list";
+	}
+	
 }

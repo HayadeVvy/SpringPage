@@ -6,6 +6,7 @@ xmlns:layout="www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layouts/lay
 <title>게시판 글상세</title>
 <link rel="stylesheet" th:href="@{/assets/css/board.css}" type="text/css">
 <script th:src="@{/assets/js/jquery-3.7.1.min.js}"></script>
+<script th:src="@{/assets/js/board.fav.js}"></script>
 </head>
 <body>
 <div layout:fragment="content" class="page-main">
@@ -41,6 +42,11 @@ xmlns:layout="www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layouts/lay
 	</div>
 	<p class="detail-content" th:utext="${board.content}"></p>
 	<div>
+		<!-- 좋아요 부분 -->
+		<img id="output_fav" th:attr="data-num=${board.board_num}" th:src="@{/assets/images/fav01.gif}" width="40" height="40">
+		<span id= "output_fcount"></span>
+		<!-- 댓글 수 -->
+		<span id= "output_rcount"></span>
 	</div>
 	<hr size="1" width="100%">
 	<div class="align-right">

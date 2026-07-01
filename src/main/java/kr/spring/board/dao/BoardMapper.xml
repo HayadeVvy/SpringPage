@@ -56,6 +56,20 @@
 		offset #{skip} rows Fetch next #{limit} rows only
 	</select>
 	
+	<!-- 게시판 글 수정 -->
+	<update id="updateBoard" parameterType="boardVO">
+    update spboard
+    set
+    <if test="filename != null">
+        filename=#{filename},
+    </if>
+    title=#{title},
+    content=#{content},
+    ip=#{ip},
+    modify_date=sysdate
+    where board_num=#{board_num}
+</update>
+	
 </mapper>
 
 
