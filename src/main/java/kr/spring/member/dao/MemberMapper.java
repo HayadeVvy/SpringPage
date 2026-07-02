@@ -1,5 +1,6 @@
 package kr.spring.member.dao;
 
+import java.util.List;
 import java.util.Map;
 
 import org.apache.ibatis.annotations.Mapper;
@@ -31,5 +32,11 @@ public interface MemberMapper {
 	//프로필 사진 업데이트
 	@Update("update spmember_detail set photo=#{photo}, photo_name=#{photo_name} where mem_num=#{mem_num}")
 	public void updateProfile(MemberVO member);
+	
+	
+	//회원관리- 관리자
+	public Integer selectRowcount(Map<String,Object> map);
+	public List<MemberVO> selectList(Map<String,Object> map);
+	public void updateByAdmin(MemberVO memberVO);
 	
 }

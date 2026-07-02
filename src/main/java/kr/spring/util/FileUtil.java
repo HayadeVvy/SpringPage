@@ -10,22 +10,31 @@ import java.util.UUID;
 
 import javax.imageio.ImageIO;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
-import jakarta.servlet.http.HttpServletRequest;
+import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
+@Component
 public class FileUtil {
-	//업로드 상대 경로 
-	private static final String UPLOAD_PATH = "/assets/upload";
+	private static String upload_path;
+	//업로드 절대 경로 
+	@Value("${file.upload.path}")
+	private String uploadPath;
+
+	@PostConstruct
+	public void init() {
+		upload_path = uploadPath;
+	}
 
 	//파일 업로드 처리
-	public static String createFile(HttpServletRequest request,MultipartFile file) throws IllegalStateException, IOException{
-		//컨텍스트 루트상의 절대 경로 구하기
-		String path = request.getServletContext().getRealPath(UPLOAD_PATH);
+	public static String createFile(MultipartFile file) throws IllegalStateException, IOException{
+		
+		log.debug("<<파일 절대 경로>> : {}", upload_path);
+		
 		String filename = null;
 		if(file!=null && !file.isEmpty()) {
 			//파일명이 중복되지 않도록 파일명 변경
@@ -33,21 +42,18 @@ public class FileUtil {
 			filename = UUID.randomUUID()+file.getOriginalFilename().substring(file.getOriginalFilename().lastIndexOf("."));
 			//_ 이후에 원래 파일명을 보존할 경우
 			//filename = UUID.randomUUID()+"_"+file.getOriginalFilename();
-			file.transferTo(new File(path+"/"+filename));
+			file.transferTo(new File(upload_path+"/"+filename));
 		}
 		return filename;
 	}
 	//파일 삭제
-	public static void removeFile(HttpServletRequest request, String filename) {
+	public static void removeFile(String filename) {
 		if(filename!=null) {
-			//컨텍스트 루트상의 절대 경로 구하기
-			String path = request.getServletContext().getRealPath(UPLOAD_PATH);
-			File file = new File(path+"/"+filename);
+			File file = new File(upload_path+"/"+filename);
 			if(file.exists()) file.delete();
 		}
 	}
-	public static String createThumbnail(HttpServletRequest request, String uploadedFile,int thumbnailWidth, int thumbnailHeight){
-		String path = request.getServletContext().getRealPath(UPLOAD_PATH);
+	public static String createThumbnail(String uploadedFile,int thumbnailWidth, int thumbnailHeight){
 		String thumbnailFile = "s" + uploadedFile;
 		int index = uploadedFile.lastIndexOf(".");
 		if(index !=-1){//썸네일의 확장자는 jpg로 변경
@@ -56,7 +62,7 @@ public class FileUtil {
 
 		FileInputStream fs = null; 
 		try { 
-			fs = new FileInputStream(path+"/"+uploadedFile);
+			fs = new FileInputStream(upload_path+"/"+uploadedFile);
 			BufferedImage im = ImageIO.read(fs);
 
 			int width;
@@ -77,7 +83,7 @@ public class FileUtil {
 			Graphics2D 	g2 = thumb.createGraphics();
 
 			g2.drawImage(im.getScaledInstance(width, height, Image.SCALE_SMOOTH), 0, 0, width, height, null);
-			ImageIO.write(thumb, "jpg", new File(path,thumbnailFile));
+			ImageIO.write(thumb, "jpg", new File(upload_path,thumbnailFile));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}finally{

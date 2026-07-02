@@ -68,8 +68,18 @@ $(function () {
             },
 
             // 업로드 실패
-            error: function () {
-                alert('네트워크 오류 발생');
+            error: function (xhr,status, error) {
+				try{
+					//서버에서 보낸 메세지 표시
+					const responseJson = JSON.parse(xhr.responseText);
+					alert(responseJson.message);
+					}
+				catch(e)
+					{
+					//json이 아닌 데이터
+					alert('네트워크 오류 발생');
+					}
+					console.error('Error:', xhr.status, xhr.responseText);
             }
 
         });

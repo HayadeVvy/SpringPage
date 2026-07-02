@@ -50,7 +50,7 @@ xmlns:layout="www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layouts/lay
 	</div>
 	<hr size="1" width="100%">
 	<div class="align-right">
-		<th:block sec:authorized="isAuthenticated()" th:if="${#authentication.principal.memberVO.mem_num == board.mem_num}">
+		<th:block sec:authorize="isAuthenticated()" th:if="${#authentication.principal.memberVO.mem_num == board.mem_num}">
 			<input type="button" value="수정" th:onclick="|location.href='update?board_num=${board.board_num}'|">
 			<input type="button" value="삭제" id="delete_btn">
 			<script type="text/javascript">

@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
@@ -36,6 +37,9 @@ public class BoardUserController {
 
 	@Autowired
 	private BoardService boardService;
+	
+	@Value("${file.upload.path}")
+	private String path;
 	
 	//자바빈 초기화
 	@ModelAttribute
@@ -73,7 +77,7 @@ public class BoardUserController {
 		board.setIp(request.getRemoteAddr());
 		
 		//파일 세팅
-		board.setFilename(FileUtil.createFile(request, board.getUpload()));
+		board.setFilename(FileUtil.createFile(board.getUpload()));
 		
 		boardService.insertBoard(board);
 		
@@ -149,7 +153,7 @@ public class BoardUserController {
 		
 		String path = request.getServletContext().getRealPath("/assets/upload") + "/" + board.getFilename();
 		
-		File downloadFile = new File(path);
+		File downloadFile = new File(path+"/"+board.getFilename());
 		
 		model.addAttribute("downloadFile", downloadFile);
 		model.addAttribute("filename", board.getFilename());
@@ -202,7 +206,7 @@ public class BoardUserController {
 		}
 		
 		//파일명 세팅(FileUtil.createFile에서 파일이 없으면 null반환)
-		boardVO.setFilename(FileUtil.createFile(request, boardVO.getUpload()));
+		boardVO.setFilename(FileUtil.createFile(boardVO.getUpload()));
 		
 		//ip세팅
 		boardVO.setIp(request.getRemoteAddr());
@@ -214,7 +218,7 @@ public class BoardUserController {
 		if(boardVO.getUpload() != null && !boardVO.getUpload().isEmpty())
 		{
 			//수정전 파일 삭제 처리
-			FileUtil.removeFile(request, db_board.getFilename());
+			FileUtil.removeFile(db_board.getFilename());
 			
 		
 		}
@@ -248,7 +252,7 @@ public class BoardUserController {
 		
 		if(db_board.getFilename() != null)
 		{
-			FileUtil.removeFile(request, db_board.getFilename());
+			FileUtil.removeFile(db_board.getFilename());
 		}
 		
 		return "redirect:/board/list";

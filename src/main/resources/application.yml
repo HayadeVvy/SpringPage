@@ -47,7 +47,7 @@ spring:
 
 mybatis: #mybatis 설정
   type-aliases-package: kr.spring.**.vo 
-  mapper-locations: kr/spring/**/dao/*.xml 
+  mapper-locations: classpath:/mapper/*.xml
   
 logging: #로그 지정
   level:
@@ -65,4 +65,8 @@ server:
       charset: UTF-8
       enabled: true
       force: true
+#파일 업로드 절대 경로
+file:
+  upload:
+    path: C:/Users/Hayar/Downloads/SpringPage/src/main/webapp/assets/upload
 

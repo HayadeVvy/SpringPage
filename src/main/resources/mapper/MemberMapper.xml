@@ -40,6 +40,45 @@
 		name = #{name}, phone =#{phone}, email= #{email}, zipcode=#{zipcode}, address1=#{address1}, address2=#{address2}, modify_date=sysdate where mem_num=#{mem_num}
 	
 	</update>
+	
+	<!-- sql태그와 include태그를 이용해 sql문을 재사용 -->
+	<!-- 검색 -->
+	<sql id="memberSearch">
+		<where>
+			<if test="keyword != null and keyword != ''">
+				<if test="keyfield == 1">
+					m.id like '%' || #{keyword} || '%' or
+					m.nick_name like '%' || #{keyword} || '%'
+				</if>
+				<if test="keyfield == 2">
+					d.name like '%' || #{keyword} || '%'
+				</if>
+				<if test="keyfield == 3">
+					d.email like '%' || #{keyword} || '%'
+				</if>
+				<if test="keyfield == 4">
+					m.id like '%' || #{keyword} || '%' or
+					m.nick_name like '%' || #{keyword} || '%' or
+					d.name like '%' || #{keyword} || '%' or 	
+					d.email like '%' || #{keyword} || '%'
+				</if>
+			</if>
+		</where>
+	</sql>
+	
+	<!-- 전체/검색 레코드 수 -->
+	<select id="selectRowCount" parameterType="map" resultType="integer">
+		select count(*) from spmember m left outer join spmember_detail d using (mem_num)
+		<include refid="memberSearch"/>
+	</select>
+	
+	<!-- 전체/검색 목록 -->
+	<select id="selectList" parameterType="map" resultType="memberVO">
+		select * from spmember m left outer join spmember_detail d using (mem_num)
+		<include refid="memberSearch"/>
+		order by d.reg_date desc nulls last
+		offset #{skip} rows fetch next #{limit} rows only
+	</select>
 </mapper>
 
 

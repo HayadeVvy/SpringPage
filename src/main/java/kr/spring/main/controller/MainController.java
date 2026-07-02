@@ -33,5 +33,10 @@ public class MainController {
 		return "thviews/main/main";
 	}
 	
+	@GetMapping("/admin/home")
+	public String adminMain(Model model)
+	{
+		return "thviews/main/admin";
+	}
 	
 }

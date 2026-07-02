@@ -53,7 +53,7 @@ public class BoardRestController {
 		else
 		{
 			service.deleteFile(board_num);
-			FileUtil.removeFile(request,db_board.getFilename());
+			FileUtil.removeFile(db_board.getFilename());
 			
 			mapAjax.put("result", "success");		
 		}
@@ -118,6 +118,19 @@ public class BoardRestController {
 			fav.setMem_num(principal.getMemberVO().getMem_num());
 			
 			BoardFavVO boardFav = service.selectFav(fav);
+			
+			if(boardFav != null)
+			{
+				service.deleteFav(fav);
+				mapAjax.put("status", "noFav");
+			}
+			else
+			{
+				service.insertFav(fav);
+				mapAjax.put("status", "yesFav");
+			}
+			mapAjax.put("result", "success");
+			mapAjax.put("count", service.selectFavCount(fav.getBoard_num()));
 		}
 		
 		return new ResponseEntity<Map<String,Object>>(mapAjax,HttpStatus.OK);
