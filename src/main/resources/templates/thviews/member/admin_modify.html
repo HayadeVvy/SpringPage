@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html xmlns:th="www.thymeleaf.org" 
+xmlns:sec="www.thymeleaf.org/extras/spring-security"
+xmlns:layout="www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layouts/layout_admin}">
+<head>
+<title>회원권한 수정(관리자용)</title>
+</head>
+<body>
+<div layout:fragment="content" class="page-main">
+	<h2>회원권한 수정(관리자용)</h2>
+	<form th:action="@{admin_update}" th:object="${memberVO}"
+	 id="modify_form" method="post">
+	 <input type="hidden" th:field="*{mem_num}">
+		<ul>
+			<li>
+				<label>회원권한</label>
+				<div th:if="${memberVO.authority != 'ROLE_ADMIN'}">
+					<input type="radio" th:field="*{authority}" value="ROLE_SUSPENDED">정지
+					<input type="radio" th:field="*{authority}" value="ROLE_USER">일반
+				</div>
+				<div th:if="${memberVO.authority == 'ROLE_ADMIN'}">
+					관리
+				</div>
+			</li>
+		</ul>
+		<div class="align-center">
+			<input type="submit" th:if="${memberVO.authority != 'ROLE_ADMIN'}" value="전송">
+			<input type="button" value="회원목록" onclick="location.href='admin_list'">
+		</div>
+		<ul>
+		<li>
+			<span>아이디 : </span>
+			<span th:text="${memberVO.id}"></span>
+		</li>
+		<li>
+			<span>별명 : </span>
+			<span th:text="${memberVO.nick_name}"></span>
+		</li>
+		<li>
+			<span>이름 : </span>
+			<span th:text="${memberVO.name}"></span>
+		</li>
+		<li>
+			<span>전화번호 : </span>
+			<span th:text="${memberVO.phone}"></span>
+		</li>
+		<li>
+			<span>이메일 : </span>
+			<span th:text="${memberVO.email}"></span>
+		</li>
+		<li>
+			<span>우편번호 : </span>
+			<span th:text="${memberVO.zipcode}"></span>
+		</li>
+		<li>
+			<span>주소 : </span>
+			<span>[[${memberVO.address1}]] [[${memberVO.address2}]]</span>
+		</li>
+	</ul>
+	</form>
+</div>
+</body>
+</html>

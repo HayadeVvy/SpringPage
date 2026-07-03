@@ -76,7 +76,7 @@ public class MemberServiceImpl implements MemberService {
 	@Override
 	public Integer selectRowcount(Map<String, Object> map) {
 		// TODO Auto-generated method stub
-		return memberMapper.selectRowcount(map);
+		return memberMapper.selectRowCount(map);
 	}
 
 
@@ -91,7 +91,7 @@ public class MemberServiceImpl implements MemberService {
 
 	@Override
 	public void updateByAdmin(MemberVO memberVO) {
-		// TODO Auto-generated method stub
+		memberMapper.updateByAdmin(memberVO);
 		
 	}
 

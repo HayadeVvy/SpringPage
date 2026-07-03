@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html xmlns:th="www.thymeleaf.org" 
+xmlns:sec="www.thymeleaf.org/extras/spring-security"
+xmlns:layout="www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layouts/layout_admin}">
+<head>
+<title>회원관리(관리자용)</title>
+<script th:src="@{/assets/js/jquery-3.7.1.min.js}"></script>
+<script th:src="@{/assets/js/search.js}"></script>
+</head>
+<body>
+<div layout:fragment="content" class="page-main">
+	<h2>회원관리(관리자용)</h2>
+	<form action="admin_list" id="search_form" method="get">
+		<ul class="search">
+			<li>
+				<select name="keyfield" id="keyfield">
+					<option value="1" th:selected="${keyfield == '1'}">ID+별명</option>
+					<option value="2" th:selected="${keyfield == '2'}">이름</option>
+					<option value="3" th:selected="${keyfield == '3'}">이메일</option>
+					<option value="4" th:selected="${keyfield == '4'}">통합검색</option>
+					
+				</select>
+			</li>
+			<li>
+				<input type="search" name="keyword" id="keyword" th:value="${keyword}">
+			</li>
+			<li>
+				<input type="submit" value="찾기" >
+				<input type="button" value="목록" onclick="location.href='list'">
+			</li>
+		</ul>
+	</form>
+	<div th:if="${count == 0}" class="result-display">표시할 회원정보가 없습니다.</div>
+	<th:block th:if="${count > 0}">
+		<table class="striped-table">
+			<tr>
+				<th>아이디(별명)</th>
+				<th>이름</th>
+				<th>전화번호</th>
+				<th>이메일</th>
+				<th>가입일</th>
+				<th>권한</th>
+			</tr>
+			<tr th:each="member : ${list}">
+				<td class="align-center">
+    <span th:if="${member.authority == 'ROLE_INACTIVE'}">
+        [[${member.id}]]([[${member.nick_name}]])
+    </span>
+
+    <a th:if="${member.authority != 'ROLE_INACTIVE'}"
+       th:href="@{/admin/member/admin_update(mem_num=${member.mem_num})}">
+        [[${member.id}]]([[${member.nick_name}]])
+    </a>
+</td>
+				<td class="align-left" th:text="${member.name}"></td>
+				<td class="align-center" th:text="${member.phone}"></td>
+				<td class="align-center" th:text="${member.email}"></td>
+				<td class="align-center" th:text="${member.reg_date}"></td>
+				<td class="align-center">
+    <th:block th:if="${member.authority == 'ROLE_INACTIVE'}">탈퇴</th:block>
+    <th:block th:if="${member.authority == 'ROLE_SUSPENDED'}">정지</th:block>
+    <th:block th:if="${member.authority == 'ROLE_USER'}">일반</th:block>
+    <th:block th:if="${member.authority == 'ROLE_ADMIN'}">관리</th:block>
+</td>
+			</tr>
+		</table>
+		<div class="align-center" th:utext="${page}"></div>
+	</th:block>
+</div>
+</body>
+</html>

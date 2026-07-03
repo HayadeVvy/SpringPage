@@ -35,8 +35,9 @@ public interface MemberMapper {
 	
 	
 	//회원관리- 관리자
-	public Integer selectRowcount(Map<String,Object> map);
+	public Integer selectRowCount(Map<String,Object> map);
 	public List<MemberVO> selectList(Map<String,Object> map);
+	@Update("update spmember set authority=#{authority} where mem_num=#{mem_num}")
 	public void updateByAdmin(MemberVO memberVO);
 	
 }

@@ -5,23 +5,35 @@
 /* ========================================================================
  * 폼에 입력한 데이터를 객체에 key와 value의 쌍으로 저장하는 메서드
  * ======================================================================== */
-jQuery.fn.serializeObject = function() {
+jQuery.fn.serializeObject = function () {
     let obj = null;
     try {
-        if (this[0].tagName && this[0].tagName.toUpperCase() == "FORM") {
-            let arr = this.serializeArray();
+        if (this[0].tagName && this[0].tagName.toUpperCase() === "FORM") {
+            const arr = this.serializeArray();
             if (arr) {
                 obj = {};
-                jQuery.each(arr, function() {
-                    obj[this.name] = this.value;
+                jQuery.each(arr, function () {
+                    const name = this.name;
+                    const value = this.value || "";
+                    // 이미 같은 key가 존재하는 경우
+                    if (obj[name] !== undefined) {
+                        // 기존 값이 배열이 아니면 배열로 변환
+                        if (!Array.isArray(obj[name])) {
+                            obj[name] = [obj[name]];
+                        }
+                        // 새 값 추가
+                        obj[name].push(value);
+
+                    } else {
+                        // 첫 값 저장
+                        obj[name] = value;
+                    }
                 });
-            }//if ( arr ) {
+            }
         }
     } catch (e) {
         alert(e.message);
-    } finally {
     }
- 
     return obj;
 };
 

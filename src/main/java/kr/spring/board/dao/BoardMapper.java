@@ -11,6 +11,7 @@ import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
 
 import kr.spring.board.vo.BoardFavVO;
+import kr.spring.board.vo.BoardReplyVO;
 import kr.spring.board.vo.BoardVO;
 @Mapper
 public interface BoardMapper {
@@ -40,4 +41,26 @@ public interface BoardMapper {
 	public void deleteFav(BoardFavVO fav);
 	@Delete("delete from spboard_fav where board_num=#{board_num}")
 	public void deleteFavByBoardNum(Long board_num);
+	
+	//댓글
+	public List<BoardReplyVO> selectListReply(Map<String,Object> map);
+	
+	public Integer selectRowCountReply(Map<String,Object> map);
+	
+	public void insertReply(BoardReplyVO boardReply);
+	
+	//댓글 수정, 삭제시 작성자 회원번호를 구하기 위해 사용
+	public BoardReplyVO selectReply(Long re_num);
+	
+	public void updateReply(BoardReplyVO boardReply);
+	
+	public void deleteReply(Long re_num);
+	
+	
+	//부모글 삭제시 댓글이 존재하면, 부모글 삭제 전 댓글 삭제
+	@Delete("delete from spboard_reply where board_num=#{board_num}")
+	public void deleteReplyByBoardNum(Long board_num);
+	
+	
+	
 }

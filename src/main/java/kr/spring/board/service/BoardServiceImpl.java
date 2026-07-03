@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import kr.spring.board.dao.BoardMapper;
 import kr.spring.board.vo.BoardFavVO;
+import kr.spring.board.vo.BoardReplyVO;
 import kr.spring.board.vo.BoardVO;
 @Service
 @Transactional
@@ -54,6 +55,8 @@ public class BoardServiceImpl implements BoardService {
 
 	@Override
 	public void deleteBoard(Long board_num) {
+		//댓글 삭제
+		boardMapper.deleteReplyByBoardNum(board_num);
 		//부모 좋아요
 		boardMapper.deleteFavByBoardNum(board_num);
 		boardMapper.deleteBoard(board_num);
@@ -87,6 +90,42 @@ public class BoardServiceImpl implements BoardService {
 	@Override
 	public void deleteFav(BoardFavVO fav) {
 		boardMapper.deleteFav(fav);
+		
+	}
+
+	@Override
+	public List<BoardReplyVO> selectListReply(Map<String, Object> map) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Integer selectRowCountReply(Map<String, Object> map) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void insertReply(BoardReplyVO boardReply) {
+		boardMapper.insertReply(boardReply);
+		
+	}
+
+	@Override
+	public BoardReplyVO selectReply(Long re_num) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void updateReply(BoardReplyVO boardReply) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void deleteReply(Long re_num) {
+		
 		
 	}
 

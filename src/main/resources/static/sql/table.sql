@@ -61,3 +61,39 @@ mem_num number not null,
 constraint fav_fk1 foreign key (board_num) references spboard (board_num),
 constraint fav_fk2 foreign key (mem_num) references spmember (mem_num)
 );
+
+--댓글
+create table spboard_reply(
+	re_num number not null,
+	re_content varchar2(900) not null,
+	re_date date default sysdate not null,
+	re_mdate date,
+	re_ip varchar2(40) not null,
+	board_num number not null,
+	mem_num number not null,
+	constraint spreply_pk primary key (re_num),
+	constraint spreply_fk1 foreign key (board_num) references spboard (board_num),
+	constraint spreply_fk2 foreign key (mem_num) references spmember (mem_num)
+);
+
+
+create sequence spreply_seq;
+
+--대댓글
+create table spboard_response
+(
+	te_num number not null,
+	te_content varchar2(900) not null,
+	te_date date default sysdate not null,
+	te_mdate date,
+	te_parent_num number not null, --부모글의 번호가 들어감, 자식글이 아니라 부모글일 경우는 0
+	te_depth number not null, --자식글의 깊이. 부모글의 자식글A 1,자식글 B 2, 부모글일 경우 0
+	te_ip varchar2(40) not null,
+	re_num number not null,
+	mem_num number not null,
+	constraint spres_pk primary key (te_num),
+	constraint spres_fk foreign key (re_num) references spboard_reply(re_num),
+	constraint spres_fk1 foreign key (mem_num) references spmember (mem_num)
+);
+
+create sequence response_seq;

@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 
 import kr.spring.board.vo.BoardFavVO;
+import kr.spring.board.vo.BoardReplyVO;
 import kr.spring.board.vo.BoardVO;
 
 public interface BoardService {
@@ -19,4 +20,17 @@ public interface BoardService {
 	public Integer selectFavCount(Long board_num);
 	public void insertFav(BoardFavVO fav);
 	public void deleteFav(BoardFavVO fav);
+	
+	public List<BoardReplyVO> selectListReply(Map<String,Object> map);
+	
+	public Integer selectRowCountReply(Map<String,Object> map);
+	
+	public void insertReply(BoardReplyVO boardReply);
+	
+	//댓글 수정, 삭제시 작성자 회원번호를 구하기 위해 사용
+	public BoardReplyVO selectReply(Long re_num);
+	
+	public void updateReply(BoardReplyVO boardReply);
+	
+	public void deleteReply(Long re_num);
 }

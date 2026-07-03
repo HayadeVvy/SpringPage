@@ -69,6 +69,18 @@
     modify_date=sysdate
     where board_num=#{board_num}
 </update>
+
+<!-- 댓글 등록 -->
+<insert id="insertReply" parameterType="boardReplyVO">
+	insert into spboard_reply(
+	re_num, re_content, re_ip, board_num, mem_num
+	) values (
+	spreply_seq.nextval, #{re_contetn}, #{re_ip}, #{board_num}, #{mem_num}
+	)
+	
+
+</insert>
+
 	
 </mapper>
 

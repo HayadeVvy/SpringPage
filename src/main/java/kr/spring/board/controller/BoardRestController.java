@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 import jakarta.servlet.http.HttpServletRequest;
 import kr.spring.board.service.BoardService;
 import kr.spring.board.vo.BoardFavVO;
+import kr.spring.board.vo.BoardReplyVO;
 import kr.spring.board.vo.BoardVO;
 import kr.spring.member.vo.PrincipalDetails;
 import kr.spring.util.FileUtil;
@@ -136,5 +137,24 @@ public class BoardRestController {
 		return new ResponseEntity<Map<String,Object>>(mapAjax,HttpStatus.OK);
 	}
 	
+	//댓글 등록
+	@PostMapping("/writeReply")
+	public ResponseEntity<Map<String,String>> writeReply(@RequestBody BoardReplyVO boardReplyVO, @AuthenticationPrincipal PrincipalDetails principal, HttpServletRequest request)
+	{
+		log.debug("<<댓글 등록>> : {}", boardReplyVO);
+		
+		Map<String,String> mapAjax = new HashMap<>();
+		
+		//회원번호 저장
+		boardReplyVO.setMem_num(principal.getMemberVO().getMem_num());
+		
+		//ip 배정
+		boardReplyVO.setRe_ip(request.getRemoteAddr());
+		//댓글 등록
+		service.insertReply(boardReplyVO);
+		mapAjax.put("result", "success");
+		
+		return new ResponseEntity<Map<String,String>>(mapAjax, HttpStatus.OK);
+	}
 	
 }
