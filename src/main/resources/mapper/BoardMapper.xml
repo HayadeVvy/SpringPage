@@ -8,6 +8,11 @@
 		<result property="memberVO.id" column ="id"/>
 		<result property="memberVO.nick_name" column = "nick_name"/>
 	</resultMap>
+	
+		<resultMap type="boardReplyVO" id="boardReplyMap">
+		<result property="memberVO.id" column ="id"/>
+		<result property="memberVO.nick_name" column = "nick_name"/>
+	</resultMap>
 
 	<!-- 게시판 글 등록 -->
 	<insert id="insertBoard" parameterType="boardVO">
@@ -75,11 +80,18 @@
 	insert into spboard_reply(
 	re_num, re_content, re_ip, board_num, mem_num
 	) values (
-	spreply_seq.nextval, #{re_contetn}, #{re_ip}, #{board_num}, #{mem_num}
+	spreply_seq.nextval, #{re_content}, #{re_ip}, #{board_num}, #{mem_num}
 	)
 	
 
 </insert>
+
+<!-- 댓글 목록 -->
+<select id="selectListReply" parameterType="map" resultMap="boardReplyMap">
+	select * from spboard_reply join spmember using (mem_num) where board_num=#{board_num}
+	order by re_num desc
+	offset #{skip} rows fetch next #{limit} rows only
+</select>
 
 	
 </mapper>

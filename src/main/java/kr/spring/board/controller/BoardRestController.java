@@ -1,8 +1,11 @@
 package kr.spring.board.controller;
 
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
+import org.apache.tomcat.util.digester.ServiceBindingPropertySource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,6 +25,7 @@ import kr.spring.board.vo.BoardReplyVO;
 import kr.spring.board.vo.BoardVO;
 import kr.spring.member.vo.PrincipalDetails;
 import kr.spring.util.FileUtil;
+import kr.spring.util.PagingUtil;
 import lombok.extern.slf4j.Slf4j;
 
 @RestController
@@ -155,6 +159,47 @@ public class BoardRestController {
 		mapAjax.put("result", "success");
 		
 		return new ResponseEntity<Map<String,String>>(mapAjax, HttpStatus.OK);
+	}
+	
+	@GetMapping("/listReply/{board_num}/{pageNum}/{rowCount}")
+	public ResponseEntity<Map<String,Object>> getList(@PathVariable long board_num, @PathVariable int pageNum, @PathVariable int rowCount, @AuthenticationPrincipal PrincipalDetails principal){
+		
+		log.debug("<<댓글 목록>> board_num: {}, pageNum: {}", board_num, pageNum);
+		
+		Map<String,Object> map = new HashMap<String,Object>();
+		
+		map.put("board_num", board_num);
+		
+		//총 글의 개수
+		int count = service.selectRowCount(map);
+		
+		List<BoardReplyVO> list = null;
+		
+		if(count > 0)
+			
+		{
+			PagingUtil page = new PagingUtil(pageNum, count, rowCount);
+			map.put("skip", page.getSkip());
+			map.put("limit", page.getLimit());
+			
+			list = service.selectListReply(map);
+		}
+		else
+		{
+			list = Collections.emptyList();
+		}
+		
+		Map<String,Object> mapAjax = new HashMap<String,Object>();
+		mapAjax.put("count", count);
+		mapAjax.put("list", list);
+		//로그인한 회원번호와 작성자 회원번호 일치 여부를 체크하기
+		//위해 로그인한 회원번호 전송
+		if(principal!=null)
+		{
+			mapAjax.put("user_num", principal.getMemberVO().getMem_num());
+		}
+		
+		return new ResponseEntity<Map<String,Object>>(mapAjax, HttpStatus.OK);
 	}
 	
 }
