@@ -50,8 +50,9 @@ public interface BoardMapper {
 	public void insertReply(BoardReplyVO boardReply);
 	
 	//댓글 수정, 삭제시 작성자 회원번호를 구하기 위해 사용
+	@Select("select * from spboard_reply where re_num=#{re_num}")
 	public BoardReplyVO selectReply(Long re_num);
-	
+	@Update("update spboard_reply set re_content=#{re_content}, re_ip=#{re_ip},re_mdate=sysdate where re_num=#{re_num}")
 	public void updateReply(BoardReplyVO boardReply);
 	
 	public void deleteReply(Long re_num);

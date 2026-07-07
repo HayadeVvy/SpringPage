@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -200,6 +201,17 @@ public class BoardRestController {
 		}
 		
 		return new ResponseEntity<Map<String,Object>>(mapAjax, HttpStatus.OK);
+	}
+	
+	//댓글 수정
+	@PutMapping("/updateReply")
+	public ResponseEntity<Map<String,String>> modifyReply(@RequestBody BoardReplyVO reply, @AuthenticationPrincipal PrincipalDetails principal, HttpServletRequest request)
+	{
+		log.debug("<<댓글 수정>> : {}", reply);
+		
+		Map<String,String> mapAjax = new HashMap<string,String>();
+		
+		return
 	}
 	
 }

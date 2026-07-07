@@ -198,14 +198,87 @@ $(function(){
 		$('textarea').val('');
 		$('#re_first .letter-count').text('300/300');
 	}
+	
+	/************************
+	* 댓글 수정
+	************************/
+	//댓글 수정 버튼 클릭시 수정 폼 노출
+	$(document).on('click', '.modify-btn', function () {
+	    const re_num = $(this).data('num');
+
+	    let re_content = $(this)
+	        .closest('.sub-item')
+	        .find('p')
+	        .html()
+	        .replace(/<br\s*\/?>/gi, '\n');
+
+	    let modifyFormHTML = `
+	        <form id="mre_form">
+	            <input type="hidden" name="re_num" value="${re_num}">
+	            <textarea rows="3" cols="50"
+	                name="re_content"
+	                id="mre_content"
+	                class="rep-content">${re_content}</textarea>
+
+	            <div id="mre_first">
+	                <span class="letter-count">300/300</span>
+	            </div>
+
+	            <div id="mre_second" class="align-right">
+	                <input type="submit" value="수정">
+	                <input type="button" value="취소" class="re-reset">
+	            </div>
+
+	            <hr size="1" noshade width="96%">
+	        </form>
+	    `;
+
+	    initModifyForm();
+
+	    // 기존 댓글 숨김
+	    $(this).closest('.sub-item').hide();
+
+	    // 수정폼 삽입
+	    $(this).closest('.item').append(modifyFormHTML);
+
+	    let inputLength = $('#mre_content').val().length;
+	    $('#mre_first .letter-count').text(`${300 - inputLength}/300`);
+	});
+	//수정 폼에서 취소 버튼 클릭시 수정폼 쵝화
+	$(document).on('click', '.re-reset', initModifyForm);
+	
+	//댓글 수정 폼 초기화
+	function initModifyForm()
+	{
+		$('.sub-item').show();
+		$('#mre_form').remove();
+	}
+	
 	/************************
 	* 댓글(답글) 등록, 수정 공통
 	************************/
 	//textarea에 내용 입력시 글자수 체크
-	$(document).on('keyup','textarea',function()
-{
-	
-});
+	$(document).on('keyup', 'textarea', function () {
+	    let inputLength = $(this).val().length;
+
+	    if (inputLength > 300) {
+	        $(this).val($(this).val().substring(0, 300));
+	        inputLength = 300;
+	    }
+
+	    const remain = `${300 - inputLength}/300`;
+	    const id = $(this).attr('id');
+
+	    if (id == 're_content') {
+	        $('#re_first .letter-count').text(remain);
+	    } else if (id == 'mre_content') {
+	        $('#mre_first .letter-count').text(remain);
+	    } else if (id == 'resp_content') {
+	        $('#resp_first .letter-count').text(remain);
+	    } else {
+	        $('#mresp_first .letter-count').text(remain);
+	    }
+	});
 	
 	
 	/************************
