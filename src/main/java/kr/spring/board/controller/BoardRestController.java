@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.ibatis.annotations.Delete;
 import org.apache.tomcat.util.digester.ServiceBindingPropertySource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -209,9 +210,47 @@ public class BoardRestController {
 	{
 		log.debug("<<댓글 수정>> : {}", reply);
 		
-		Map<String,String> mapAjax = new HashMap<string,String>();
+		Map<String,String> mapAjax = new HashMap<>();
 		
-		return
+		BoardReplyVO db_reply = service.selectReply(reply.getRe_num());
+		
+		if(principal.getMemberVO().getMem_num() == db_reply.getMem_num())
+		{
+			//로그인 회원번호롸 작성자 회원번호 일치
+			//ip저장
+			reply.setRe_ip(request.getRemoteAddr());
+			mapAjax.put("result", "success");
+		}
+		else
+		{
+			//로그인 회원번호와 작성자 회원번호 불일치
+			mapAjax.put("result", "wrongAccess");
+		}
+		return new ResponseEntity<Map<String,String>>(mapAjax, HttpStatus.OK);
+	}
+	
+	//댓글 삭제
+	@DeleteMapping("/deleteReply/{re_num}")
+	public ResponseEntity<Map<String,String>> deleteReply(@PathVariable long re_num, @AuthenticationPrincipal PrincipalDetails principal)
+	{
+		log.debug("<<댓글 삭제>> : re_num : {}", re_num);
+		
+		Map<String,String> mapAjax = new HashMap<>();
+		BoardReplyVO db_reply = service.selectReply(re_num);
+		if(principal.getMemberVO().getMem_num() == db_reply.getMem_num())
+		{
+			//로그인한 회원번호와 작성자 회원번호가 일치
+			service.deleteReply(re_num);
+			mapAjax.put("result", "success");
+			
+		}
+		else
+		{
+			//로그인한 회원번호와 작성자 회원번호 불일치
+			mapAjax.put("result", "wrongAccess");
+		}
+		
+		return new ResponseEntity<Map<String,String>>(mapAjax, HttpStatus.OK);
 	}
 	
 }

@@ -254,6 +254,69 @@ $(function(){
 		$('#mre_form').remove();
 	}
 	
+	//댓글 수정
+	$(document).on('submit', '#mre_form', function(event){
+		//기본 이벤트 제거
+		event.preventDefault();
+		
+		if($('#mre_content').val().trim() == '')
+			{
+				alert('내용을 입력하세요!');
+				$('#mre_content').val('').focus('');
+				return;
+			}
+		
+			const formData = $(this).serializeObject();
+			
+			//서버와 통신
+			$.ajax({
+				url:'updateReply',
+				type: 'put',
+				data:JSON.stringify(formData),
+				contentType: 'application/json;charset=utf-8',
+				dataType: 'json',
+				beforeSend: function (xhr) {
+					xhr.setRequestHeader(
+					$('meta[name="csrf-header"]').attr('content'),
+					$('meta[name="csrf-token"]').attr('content')
+					);
+				},
+				success: function(param)
+				{
+					if(param.result == 'success')
+						{
+							const container = $('#mre_form').parent();
+							container.find('p').html(customBrNoHtml($('#mre_content').val()));
+							container.find('.modify-date').text('최근 수정일: 5초미만');
+							initModifyForm();
+						}
+						else if(param.result == 'wrongAccess')
+							{
+								alert("타인의 글을 수정할 수 없습니다.");
+							}
+							else
+								{
+									alert('댓글 수정 오류 발생');
+								}
+				},
+				error: function(xhr)
+				{
+					try{
+						const responseJson = JSON.parse(xhr.responseText);
+						alert(responseJson.message);	
+						}
+					catch(e)
+						{
+						//JSON이 아닌경우
+						alert('네트워크 오류 발생');
+						}
+					console.error('Error:', xhr.status, xhr.responseText);
+				}
+				
+			})
+	});
+	
+	
 	/************************
 	* 댓글(답글) 등록, 수정 공통
 	************************/
@@ -280,6 +343,97 @@ $(function(){
 	    }
 	});
 	
+	/************************
+	* 댓글 삭제
+	************************/
+	$(document).on('click', '.delete-btn', function(){
+		const re_num = $(this).data('num');
+		//서버와 통신
+		$.ajax({
+			url: 'deleteReply/' + re_num,
+			type: 'delete',
+			dataType: 'json',
+			beforeSend: function (xhr) {
+				xhr.setRequestHeader(
+				$('meta[name="csrf-header"]').attr('content'),
+				$('meta[name="csrf-token"]').attr('content')
+				);
+			},
+			success:function(param)
+			{
+				if (param.result == 'success')
+					{
+						alert('삭제완료');
+						fetchReplyList(1);
+					}
+				else if(param.result == 'wrongAccess')
+					{
+						alert('타인의 글을 삭제할수 없습니다.');
+					}
+				else
+					{
+						alert('댓글삭제 오류 발생!');
+					}
+			},
+			error: function()
+			{
+				
+			}
+			
+			
+		})
+	});
+	
+	/************************
+	* 답글 등록
+	************************/
+	//답글 작성 버튼 클릭시 답글 작성 폼 노출
+	$(document).on('click','.response-btn, .response2-btn', function(){
+		//모든 폼 초기화
+		initResponseForm();
+		//클릭하면 모든 답글 작성 버튼을 노출시키고 클릭한
+		//답들 작성 버튼만 숨기기
+		$(this).hide();
+		
+		//댓글 번호
+		let re_num = $(this).attr('data-num');
+		
+		//부모글 번호
+		let te_parent_num = $(this).attr('data-parent');
+		//깊이
+		let te_depth = $(this).attr('data-depth');
+		
+		let responseUI = `
+			<form id="resp_form">
+				<input type="hidden" name="re_num" value="${re_num}">
+				<input type="hidden" name="te_parent_num" value="${te_parent_num}">
+				<input type="hidden" name="te_depth" value="${te_depth}">
+				<textarea rows="3" cols="50" name="te_content" id="resp_content" class="rep-content"></textarea>
+				<div id="resp_first">
+					<span class="letter-count">300/300</span>
+				</div>
+				<div id="resp_second" class="align-right">
+					<input type="submit" value="답글 작성">
+					<input type="button" value="취소" class="resp-reset">
+				</div>
+			</form>
+		`;
+		
+		//문서 객체에 적용
+		//after는 선택한 요소의 바로 뒤(형제 노드 위치)에
+		//새로운 HTML이나 요소를 추가
+		$(this).after(responseUI);
+	});
+	
+	//답글에서 취소 버튼 클릭시 답글 폼 초기화
+	$(document).on('click', '.resp-reset', initResponseForm);
+	
+	//답글 작성 폼 초기화
+	function initResponseForm()
+	{
+		$('.response-btn, .response2-btn').show();
+		$('#resp_form').remove();
+	}
 	
 	/************************
 	* 초기 데이터(목록) 호출

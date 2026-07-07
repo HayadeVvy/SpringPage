@@ -125,7 +125,7 @@ public class BoardServiceImpl implements BoardService {
 
 	@Override
 	public void deleteReply(Long re_num) {
-		
+		boardMapper.deleteReply(re_num);
 		
 	}
 
