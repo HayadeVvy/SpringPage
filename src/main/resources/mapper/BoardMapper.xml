@@ -93,6 +93,11 @@
 	offset #{skip} rows fetch next #{limit} rows only
 </select>
 
+<!-- 답글 등록 -->	
+<insert id="insertResponse" parameterType="boardResponseVO">
+	insert into spboard_response(te_num, te_content, te_parent_num, te_depth, te_ip, re_num, mem_num) values
+	(response_seq.nextval, #{te_content}, #{te_parent_num}, #{te_depth}, #{te_ip}, #{re_num}, #{mem_num})
+</insert>
 	
 </mapper>
 

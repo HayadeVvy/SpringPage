@@ -24,6 +24,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import kr.spring.board.service.BoardService;
 import kr.spring.board.vo.BoardFavVO;
 import kr.spring.board.vo.BoardReplyVO;
+import kr.spring.board.vo.BoardResponseVO;
 import kr.spring.board.vo.BoardVO;
 import kr.spring.member.vo.PrincipalDetails;
 import kr.spring.util.FileUtil;
@@ -249,6 +250,28 @@ public class BoardRestController {
 			//로그인한 회원번호와 작성자 회원번호 불일치
 			mapAjax.put("result", "wrongAccess");
 		}
+		
+		return new ResponseEntity<Map<String,String>>(mapAjax, HttpStatus.OK);
+	}
+	
+	//답글 등록
+	@PostMapping("/writeResponse")
+	public ResponseEntity<Map<String,String>> writeResponse(@RequestBody BoardResponseVO boardResponseVO, @AuthenticationPrincipal PrincipalDetails principal, HttpServletRequest request)
+	{
+		log.debug("<<답글 등록>> : {}", boardResponseVO);
+		Map<String, String> mapAjax = new HashMap<>();
+		
+		//회원 번호 저장
+		boardResponseVO.setMem_num(principal.getMemberVO().getMem_num());
+		
+		//아이피 저장
+		boardResponseVO.setTe_ip(request.getRemoteAddr());
+		
+		//답글 등록
+		service.insertResponse(boardResponseVO);
+		mapAjax.put("result", "success");
+		
+		
 		
 		return new ResponseEntity<Map<String,String>>(mapAjax, HttpStatus.OK);
 	}

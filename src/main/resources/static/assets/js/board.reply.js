@@ -119,14 +119,14 @@ $(function(){
 					{
 						buttons += `
 						<div>
-							<input type="button" data-status="0" data-num="${item.re_num}" value="^ 답글 ${item.resp_cnt}" class="response-btn">
+							<input type="button" data-status="0" data-num="${item.re_num}" value="^ 답글 ${item.resp_cnt}" class="rescontent-btn">
 						</div>
 						`;
 					} 
 					else{
 						buttons += `
 						<div>
-							<input type="button" data-status="0" data-num="${item.re_num}" value="^ 답글 0" class="response-btn" style="display:none;">
+							<input type="button" data-status="0" data-num="${item.re_num}" value="^ 답글 0" class="rescontent-btn" style="display:none;">
 						</div>
 						`;
 					}
@@ -434,6 +434,62 @@ $(function(){
 		$('.response-btn, .response2-btn').show();
 		$('#resp_form').remove();
 	}
+	
+	
+	//답글 등록
+	$(document).on("submit", '#resp_form', function(event){
+		//기본 이벤트 제거
+		event.preventDefault();
+		//폼 정보 보관
+		const resp_form = $(this);
+		
+		if($('$#resp_content').val().trim() == '')
+			{
+				alert('내용을 입력하세요');
+				$('#resp_content').val('').focus();
+				return;
+			}
+		const form_data = $(this).serializeObject();
+		//상단에 숨겨둔 댓글번호 가져오기
+		const re_num = $('#resp_num').val();
+		
+		//서버와 통신
+		$.ajax({
+			url:'writeResponse',
+			type: 'post',
+			data: JSON.stringify(form_data),
+			contentType: 'application/json;charset=utf-8',
+			dataType: 'json',
+			beforeSend: function (xhr) {
+				xhr.setRequestHeader(
+				$('meta[name="csrf-header"]').attr('content'),
+				$('meta[name="csrf-token"]').attr('content')
+				);
+			},
+			success:function(param)
+			{
+				if(param.result == 'success')
+					{
+						const btnContainer = resp_form.parents('/sub-item').find('div .rescontent-btn');
+					}else{
+						alert('답글 작성 오류 발생!');
+					}
+			},
+			error: function(xhr)
+			{
+				try{
+					const responseJson = JSON.parse(xhr.responseText);
+					alert(responseJson.message);	
+					}
+				catch(e)
+					{
+					//JSON이 아닌경우
+					alert('네트워크 오류 발생');
+					}
+				console.error('Error:', xhr.status, xhr.responseText);
+			}
+		})
+	})
 	
 	/************************
 	* 초기 데이터(목록) 호출

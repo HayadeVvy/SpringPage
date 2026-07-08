@@ -77,5 +77,6 @@ public interface BoardMapper {
 	public Integer selectResponseCount(Long re_num);
 	//부모글 삭제시 댓글의 답글이 존재하면 댓글 번호를 구해서
 	//답글 삭제시 사용
+	@Delete("Delete from spboard_response where re_num in (select re_num from spboard_reply where board_num=#{board_num}) ")
 	public void deleteResponseByBoardNum(Long board_num);
 }

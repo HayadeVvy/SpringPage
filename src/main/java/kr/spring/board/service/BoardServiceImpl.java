@@ -10,6 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 import kr.spring.board.dao.BoardMapper;
 import kr.spring.board.vo.BoardFavVO;
 import kr.spring.board.vo.BoardReplyVO;
+import kr.spring.board.vo.BoardResponseVO;
 import kr.spring.board.vo.BoardVO;
 @Service
 @Transactional
@@ -55,6 +56,8 @@ public class BoardServiceImpl implements BoardService {
 
 	@Override
 	public void deleteBoard(Long board_num) {
+		//답글 삭제
+		boardMapper.deleteResponseByBoardNum(board_num);
 		//댓글 삭제
 		boardMapper.deleteReplyByBoardNum(board_num);
 		//부모 좋아요
@@ -125,7 +128,57 @@ public class BoardServiceImpl implements BoardService {
 
 	@Override
 	public void deleteReply(Long re_num) {
+		//답글 삭제
+		boardMapper.deleteResponseByReNum(re_num);
 		boardMapper.deleteReply(re_num);
+		
+	}
+
+	@Override
+	public List<BoardResponseVO> selectListResponse(Long re_num) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public BoardResponseVO selectResponse(Long te_num) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void insertResponse(BoardResponseVO boardResponse) {
+		boardMapper.insertResponse(boardResponse);
+		
+	}
+
+	@Override
+	public void updateResponse(BoardResponseVO boardResponse) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void deleteResponse(Long te_num) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void deleteResponseByReNum(Long re_num) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public Integer selectResponseCount(Long re_num) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void deleteResponseByBoardNum(Long board_num) {
+		// TODO Auto-generated method stub
 		
 	}
 
