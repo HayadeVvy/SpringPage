@@ -276,4 +276,23 @@ public class BoardRestController {
 		return new ResponseEntity<Map<String,String>>(mapAjax, HttpStatus.OK);
 	}
 	
+	//답글 등록
+	@GetMapping("/listResp/{re_num}")
+	public ResponseEntity<Map<String,Object>> getListResp(@PathVariable long re_num, @AuthenticationPrincipal PrincipalDetails principal)
+	{
+		log.debug("<<답글 목록>> re_num : {}", re_num);
+		
+		List<BoardResponseVO> list = service.selectListResponse(re_num);
+		Map<String, Object> mapAjax = new HashMap<String, Object>();
+		mapAjax.put("list", list);
+		
+		if(principal!= null)
+		{
+			mapAjax.put("user_num", principal.getMemberVO().getMem_num());
+		}
+		
+		return new ResponseEntity<Map<String,Object>>(mapAjax, HttpStatus.OK);
+	}
+	
+	
 }

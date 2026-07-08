@@ -13,6 +13,13 @@
 		<result property="memberVO.id" column ="id"/>
 		<result property="memberVO.nick_name" column = "nick_name"/>
 	</resultMap>
+	
+	<resultMap type="boardResponseVO" id="boardResponseMap">
+		<result property="memberVO.id" column ="id"/>
+		<result property="memberVO.nick_name" column = "nick_name"/>
+		<result property="memberVO.parent.id" column ="parent_id"/>
+		<result property="memberVO.pnick_name.nick_name" column = "pnick_name"/>
+	</resultMap>
 
 	<!-- 게시판 글 등록 -->
 	<insert id="insertBoard" parameterType="boardVO">
@@ -88,7 +95,7 @@
 
 <!-- 댓글 목록 -->
 <select id="selectListReply" parameterType="map" resultMap="boardReplyMap">
-	select * from spboard_reply join spmember using (mem_num) where board_num=#{board_num}
+	select * from spboard_reply join spmember using (mem_num) left outer join (select re_num, count(*) resp_cnt from spboard_response group by re_num) using (re_num) where board_num=#{board_num}
 	order by re_num desc
 	offset #{skip} rows fetch next #{limit} rows only
 </select>
@@ -98,6 +105,21 @@
 	insert into spboard_response(te_num, te_content, te_parent_num, te_depth, te_ip, re_num, mem_num) values
 	(response_seq.nextval, #{te_content}, #{te_parent_num}, #{te_depth}, #{te_ip}, #{re_num}, #{mem_num})
 </insert>
+	
+	<!-- 답글 목록 -->
+	<select id="selectListResponse" parameterType="long" resultMap="boardResponseMap">
+		select
+		 r.te_num, r.te_content, r.mem_num, a.id, a.nick_name, r.te_date, r.te_mdate, r.te_ip, r.re_num, r.te_depth, r.te_parent_num, m.id parent_id, m.nick_name pnick_name
+		 from spboard_response r
+		 join spmember a on r.mem_num = a.mem_num
+		 left outer join spboard_response s 
+		 on r.te_parent_num = s.te_num
+		 left outer join spmember m on s.mem_num = m.mem_num
+		 where r.re_num = #{re_num}
+		 start with r.te_depth=0 
+		 connect by prior r.te_num = r.te_parent_num
+		 order siblings by r.te_num desc
+	</select>
 	
 </mapper>
 

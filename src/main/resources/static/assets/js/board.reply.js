@@ -119,14 +119,14 @@ $(function(){
 					{
 						buttons += `
 						<div>
-							<input type="button" data-status="0" data-num="${item.re_num}" value="^ 답글 ${item.resp_cnt}" class="rescontent-btn">
+							<input type="button" data-status="0" data-num="${item.re_num}" value="△ 답글 ${item.resp_cnt}" class="rescontent-btn">
 						</div>
 						`;
 					} 
 					else{
 						buttons += `
 						<div>
-							<input type="button" data-status="0" data-num="${item.re_num}" value="^ 답글 0" class="rescontent-btn" style="display:none;">
+							<input type="button" data-status="0" data-num="${item.re_num}" value="△ 답글 0" class="rescontent-btn" style="display:none;">
 						</div>
 						`;
 					}
@@ -443,7 +443,7 @@ $(function(){
 		//폼 정보 보관
 		const resp_form = $(this);
 		
-		if($('$#resp_content').val().trim() == '')
+		if($('#resp_content').val().trim() == '')
 			{
 				alert('내용을 입력하세요');
 				$('#resp_content').val('').focus();
@@ -470,7 +470,17 @@ $(function(){
 			{
 				if(param.result == 'success')
 					{
-						const btnContainer = resp_form.parents('/sub-item').find('div .rescontent-btn');
+						const btnContainer = resp_form.parents('.sub-item').find('div .rescontent-btn');
+						//답글 개수 업데이트
+						btnContainer.show();
+						btnContainer.attr('data-status', 1);
+						const newCount = Number(btnContainer.val().substring(5)) + 1;
+						btnContainer.val(`▽ 답글 ${newCount}`);
+						
+						//답글 목록 새로고침
+						getListResponse(re_num, resp_form.parents('.sub-item'));
+						
+						initResponseForm();
 					}else{
 						alert('답글 작성 오류 발생!');
 					}
@@ -491,6 +501,78 @@ $(function(){
 		})
 	})
 	
+	//버튼 누를시 답글 목록 펼치기/감추기
+	$(document).on('click','.rescontent-btn', function(){
+		//data-status의 값이 0이면, 답글 미표시, 1이면 답글 표시 상태
+		if($(this).attr('data-status') == 0)
+			{
+				//0이면 답글 미표시 상태이므로 답글이 있으면 답글을 표시
+				//댓글 번호
+				let re_num = $(this).data('num');
+				//답글 목록 호출
+				getListResponse(re_num, $(this).parent());
+				
+				//현재 선택한 내용의 답글 표시 아이콘 토글 처리
+				$(this).val($(this).val().replace('△', '▽'));
+				$(this).attr('data-status', 1);
+			}
+			else
+			{
+				//현재 선택한 내용의 답글 표시 아이콘 토글 처리
+				$(this).val($(this).val().replace('▽', '△'));
+				$(this).attr('data-status', 0);
+				//현재 선택한 내용 삭제
+				$(this).parents('.item').find('.respitem').remove();
+			}
+	});
+	
+	/************************
+	* 답글 목록
+	************************/
+	function getListResponse(re_num,responseUI)
+	{
+		$.ajax({
+			url: 'listResp/' + re_num,
+			type: 'get',
+			dataType:'json',
+			success:function(param){
+				//ui 초기화
+				responseUI.find('.respitem').remove();
+				let output = '';
+				$(param.list).each(function(index,item){
+					const sign_depth = '▷'.repeat(item.te_depth);
+					const sign_nick = item.te_parent_num > 0 ? `${sign_depth} ${item.memberVO.parentName}` : '';
+					
+					output += `
+						<div class="respitem">
+							<ul class="detail-info">
+								<li class="resp-pro">
+									<b>${sign_nick}</b>
+									<img src="../member/viewProfile?mem_num=${item.mem_num}" width="30" height="30" class="my-photo">
+									<div>
+									${item.memberVO.userName}<br>
+									<span class="modify-date">${item.te_mdate ? `최근 수정일 : ${item.te_mdate}` : `등록일 : ${item.te_date}`}</span>
+									</div>
+								</li>
+							</ul>
+							<div class="resp-sub-item">
+								<p>${customBrNoHtml(item.te_content)}</p>
+								${
+									param.user_num == item.mem_num 
+									? `<input>`
+									: ''
+								}
+							</div>
+						</div>
+					`;
+				});
+			},
+			error: function()
+			{
+				alert('네트워크 오류 발생');
+			}
+		});
+	}
 	/************************
 	* 초기 데이터(목록) 호출
 	************************/

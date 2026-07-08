@@ -136,8 +136,8 @@ public class BoardServiceImpl implements BoardService {
 
 	@Override
 	public List<BoardResponseVO> selectListResponse(Long re_num) {
-		// TODO Auto-generated method stub
-		return null;
+		
+		return boardMapper.selectListResponse(re_num);
 	}
 
 	@Override
