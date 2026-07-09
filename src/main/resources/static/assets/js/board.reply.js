@@ -405,7 +405,7 @@ $(function(){
 		
 		let responseUI = `
 			<form id="resp_form">
-				<input type="hidden" name="re_num" value="${re_num}">
+				<input type="hidden" name="re_num" id="resp_num" value="${re_num}">
 				<input type="hidden" name="te_parent_num" value="${te_parent_num}">
 				<input type="hidden" name="te_depth" value="${te_depth}">
 				<textarea rows="3" cols="50" name="te_content" id="resp_content" class="rep-content"></textarea>
@@ -559,13 +559,24 @@ $(function(){
 								<p>${customBrNoHtml(item.te_content)}</p>
 								${
 									param.user_num == item.mem_num 
-									? `<input>`
+									? `<input type="button" data-num="${item.te_num}" data-mem="${item.mem_num}" value="수정" class="resp-modify-btn">
+									<input type="button" data-num="${item.te_num}" data-mem="${item.mem_num}" data-rnum="${item.re_num}" value="삭제" class="resp-delete-btn">
+									
+									`
 									: ''
 								}
+								${param.user_num
+									? `<input type="button" data-num=${item.re_num} data-parent="${item.te_num}" data-depth="${item.te_depth + 1}"value="답글 작성" class="response2-btn">`
+									: ''
+									
+								}
+								
 							</div>
 						</div>
 					`;
 				});
+				
+				responseUI.append(output);
 			},
 			error: function()
 			{
@@ -573,6 +584,179 @@ $(function(){
 			}
 		});
 	}
+	
+	/************************
+	* 답글 수정
+	************************/
+	//답글 수정 버튼 클릭 시 수정폼 노출
+	$(document).on('click', '.resp-modify-btn', function(){
+		//폼 초기화
+		initResponseModifyForm();
+		
+		const te_num = $(this).attr('data-num');
+		const content = $(this).parent().find('p').html().replace(/<br>/gi, '\r\n')
+		
+		const modifyUI = `
+			<form id="mresp_form">
+				<input type="hidden" name="te_num" id="mresp_num" value="${te_num}">
+				<textarea rows="3" cols="50" name="te_content" id="mresp_content" class="rep-content">
+				${content}
+				</textarea>
+				<div id="mresp_first">
+					<span class="letter-count">300/300</span>
+				
+				</div>
+				<div id="resp_second">
+					<input type="submit" value="수정">
+					<input type="button" value="취소" class="mresp-reset">
+				</div>
+				<hr size="1" noshade width="96%">
+			</form>
+		`;
+		
+		$(this).parent().hide();//기존 내용을 숨기기
+		$(this).closest('.respitem').append(modifyUI);
+		
+		//글자 수 갱신
+		const inputLength = $('#mresp_content').val().length;
+		
+		$('#mresp_first .letter-count').text(`${300-inputLength}/300`);
+		
+	});
+	
+	//답글 수정 폼 초기화
+	function initResponseModifyForm(){
+	    $('.resp-sub-item').show();
+	    $('#mresp_form').remove();
+	}
+	
+	//답글 수정 취소 버튼 클릭시 답글 수정폼 초기화
+	$(document).on('click', '.mresp-reset', initResponseModifyForm);
+	
+	//답글 수정
+	$(document).on('submit', '#mresp_form', function(event){
+		
+		//기본 이벤트 제거
+		event.preventDefault();
+		
+		if($('#mresp_content').val().trim() =='')
+			{
+				alert("내용을 입력하세요");
+				$('#mresp_content').val('').focus();
+				return;
+			}
+		const form_data = $(this).serializeObject();
+		
+		//서버와 통신
+		$.ajax({
+			url: 'updateResponse',
+			type:'put',
+			data: JSON.stringify(form_data),
+			dataType: 'json',
+			contentType: 'application/json;charset=utf-8',
+			beforeSend: function (xhr) {
+				xhr.setRequestHeader(
+				$('meta[name="csrf-header"]').attr('content'),
+				$('meta[name="csrf-token"]').attr('content')
+				);
+			},
+			success: function(param){
+				if(param.result == 'success')
+					{
+						$('#mresp_form').parent().find('p').html(customBrNoHtml($('#mresp_content').val()));
+						$('#mresp_form').parent().find('.modify-date').text('최근 수정일: 5초 미만');
+						initResponseModifyForm();
+					}
+				else if(param.result == 'wrongAccess')
+					{
+						alert('타인의 글을 수정할수 없습니다.');
+					}
+				else
+					{
+						alert('답글 수정 오류!');
+					}
+			},
+			error: function(xhr)
+			{
+			try{
+				const responseJson = JSON.parse(xhr.responseText);
+				alert(responseJson.message);	
+				}
+			catch(e)
+				{
+				//JSON이 아닌경우
+				alert('네트워크 오류 발생');
+				}
+				console.error('Error:', xhr.status, xhr.responseText);
+			}
+		});
+	});
+	
+	/************************
+	* 답글 삭제
+	************************/
+	
+	$(document).on('click', '.resp-delete-btn', function(){
+		const re_num = $(this).data('rnum');
+		const te_num = $(this).data('num');
+		const mem_num = $(this).data('mem');
+		const $btn = $(this);
+		
+		//서버와 통신
+		$.ajax({
+		url: `deleteResponse/${te_num}/${mem_num}`,
+		type: 'delete',
+		dataType: 'json',
+		beforeSend: function (xhr) {
+			xhr.setRequestHeader(
+			$('meta[name="csrf-header"]').attr('content'),
+			$('meta[name="csrf-token"]').attr('content')
+			);
+		},
+		success: function(param)
+		{
+			if(param.result == 'success')
+				{
+					alert('삭제완료');
+					const $target = $(btn).parents('.sub-item').find('div .rescontent-btn');
+					
+					$target.val(`▽ 답글 ${param.cnt}`);
+					if (param.cnt > 0)
+						{
+							getListResponse(re_num,$btn.parents('.sub-item'));
+						}
+					else
+						{
+							$target.hide();
+							$('.respitem').remove();
+						}
+				}
+			else if(param.result == 'wrongAccess')
+				{
+					alert('타인의 글은 삭제가 불가능 합니다.');
+				}
+			else
+				{
+					alert('답글 삭제 오류');
+				}
+				
+		},
+		error: function(xhr)
+		{
+			try{
+				const responseJson = JSON.parse(xhr.responseText);
+				alert(responseJson.message);	
+				}
+			catch(e)
+				{
+				//JSON이 아닌경우
+				alert('네트워크 오류 발생');
+				}
+				console.error('Error:', xhr.status, xhr.responseText);
+			}
+		});
+	});
+	
 	/************************
 	* 초기 데이터(목록) 호출
 	************************/

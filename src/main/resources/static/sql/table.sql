@@ -97,3 +97,12 @@ create table spboard_response
 );
 
 create sequence response_seq;
+
+--그룹 채팅
+create table sptalkroom(
+talkroom_num number not null,
+basic_name varchar2(900) not null, --채팅 멤버를 추가할 때 채팅방 이름을 basic_name에서 가져다 쓰게 만들기
+talkroom_date date default sysdate not null,
+constraint sptalkroom_pk primary key (talkroom_num)
+
+)

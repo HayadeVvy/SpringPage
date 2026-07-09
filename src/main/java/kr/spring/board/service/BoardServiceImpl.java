@@ -142,8 +142,8 @@ public class BoardServiceImpl implements BoardService {
 
 	@Override
 	public BoardResponseVO selectResponse(Long te_num) {
-		// TODO Auto-generated method stub
-		return null;
+	
+		return boardMapper.selectResponse(te_num);
 	}
 
 	@Override
@@ -154,13 +154,13 @@ public class BoardServiceImpl implements BoardService {
 
 	@Override
 	public void updateResponse(BoardResponseVO boardResponse) {
-		// TODO Auto-generated method stub
+		boardMapper.updateResponse(boardResponse);
 		
 	}
 
 	@Override
 	public void deleteResponse(Long te_num) {
-		// TODO Auto-generated method stub
+		boardMapper.deleteResponse(te_num);
 		
 	}
 
@@ -172,8 +172,8 @@ public class BoardServiceImpl implements BoardService {
 
 	@Override
 	public Integer selectResponseCount(Long re_num) {
-		// TODO Auto-generated method stub
-		return null;
+		
+		return boardMapper.selectResponseCount(re_num);
 	}
 
 	@Override

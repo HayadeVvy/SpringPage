@@ -15,11 +15,11 @@
 	</resultMap>
 	
 	<resultMap type="boardResponseVO" id="boardResponseMap">
-		<result property="memberVO.id" column ="id"/>
-		<result property="memberVO.nick_name" column = "nick_name"/>
-		<result property="memberVO.parent.id" column ="parent_id"/>
-		<result property="memberVO.pnick_name.nick_name" column = "pnick_name"/>
-	</resultMap>
+    <result property="memberVO.id" column="id"/>
+    <result property="memberVO.nick_name" column="nick_name"/>
+    <result property="memberVO.parent_id" column="parent_id"/>
+    <result property="memberVO.pnick_name" column="pnick_name"/>
+</resultMap>
 
 	<!-- 게시판 글 등록 -->
 	<insert id="insertBoard" parameterType="boardVO">
@@ -120,6 +120,18 @@
 		 connect by prior r.te_num = r.te_parent_num
 		 order siblings by r.te_num desc
 	</select>
+	
+	<!-- 답글 삭제 -->
+	<delete id="deleteResponse" parameterType="long">
+		delete from spboard_response where te_num in (
+		select te_num from spboard_response
+		start with te_num = #{te_num}
+		connect by prior te_num = te_parent_num
+		)
+	
+	
+	</delete>
+	
 	
 </mapper>
 
