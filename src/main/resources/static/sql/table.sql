@@ -104,5 +104,37 @@ talkroom_num number not null,
 basic_name varchar2(900) not null, --채팅 멤버를 추가할 때 채팅방 이름을 basic_name에서 가져다 쓰게 만들기
 talkroom_date date default sysdate not null,
 constraint sptalkroom_pk primary key (talkroom_num)
+);
 
-)
+create sequence sptalkroom_seq;
+
+create table sptalk(
+talk_num number not null,
+talkroom_num number not null,	--수신 그룹
+mem_num number not null -- 발신자
+message varchar2(4000) not null,
+chat_date date default sysdate not null,
+constraint sptalk_pk primary key (talk_num),
+constraint sptalk_fk1 foreign key (talkroom_num) references sptalkroom (talkroom_num),
+constraint sptalk_fk2 foreign key (mem_num) references spmember (mem_num)
+);
+
+create sequence sptalk_seq;
+
+create table sptalk_read(
+talkroom_num number not null,
+talk_num number not null,
+mem_num number not null,
+constraint read_fk foreign key (talkroom_num) references sptalkroom (talkroom_num),
+constraint read_fk2 foreign key (talk_num) references sptalk (talk_num),
+constraint read_fk3 foreign key (mem_num) references spmember (mem_num)
+);
+
+create table sptalk_member(
+talkroom_num number not null,
+mem_num number not null,
+member_date date default sysdate not null,
+constraint sptalkmember_fk1 foreign key (talkroom_num) references sptalkroom (talkroom_num),
+constraint sptalkmember_fk2 foreign key (mem_num) references spmember(mem_num)
+
+);

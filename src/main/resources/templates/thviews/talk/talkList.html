@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html xmlns:th="www.thymeleaf.org" xmlns:layout="www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layouts/layout_mypage}">
+<head>
+<meta charset="UTF-8">
+<title>채팅 리스트</title>
+<link rel="stylesheet" th:href="@{/assets/css/talk.css}" type="text/css">
+<script type="text/javascript" th:src="@{/assets/js/message.talk.js}"></script>
+</head>
+<body>
+<div layout:fragment="content" class="page-main">
+	<h2>채팅리스트</h2>
+		<div class="align-right">
+			<input type="button" value="채팅방 생성" onclick="location.href='talkRoomWrite'">
+		</div>
+</div>
+</body>
+</html>

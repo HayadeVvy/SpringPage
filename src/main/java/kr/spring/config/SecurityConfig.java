@@ -67,7 +67,8 @@ public class SecurityConfig{
 								"/",
 								"/main/**",
 								"/member/**",
-								"/board/**"
+								"/board/**",
+								"/talk/**"
 						).permitAll()
 						//위조건 외에는 인증 필요. 인증되지 않은 요청은 로그인 페이지로 redirect함.
 						.anyRequest().authenticated() 

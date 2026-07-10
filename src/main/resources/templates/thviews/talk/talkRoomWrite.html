@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html xmlns:th="www.thymeleaf.org" xmlns:layout="www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layouts/layout_mypage}">
+<head>
+<meta charset="UTF-8">
+<title>채팅발 생성</title>
+<link rel="stylesheet" th:href="@{/assets/css/talk.css}" type="text/css">
+<script type="text/javascript" th:src="@{/assets/js/message.talk.js}"></script>
+</head>
+<body>
+<div layout:fragment="content" class="page-main">
+	<h2>채팅방 생성</h2>
+	<form th:action="@{talkRoomWrite}" method="post" id="talk_form">
+		<input type="hidden" name="members" 
+		id="user" th:data-id="${#authentication.principal.memberVO.id}" 
+		th:value="${#authentication.principal.memberVO.mem_num}">
+		<ul>
+			<li>
+				<label for="basic_name">채팅방 이름</label>
+				<input type="hidden" name="basic_name" id="basic_name">
+				<span id="name_span"></span>
+				<input type="checkbox" checked id="name_checked">(자동생성)
+			</li>
+			<li>
+				<label>채팅회원검색</label>
+				<input type="text" id="member_search" autocomplete="off">
+				<ul id="search_area"></ul>
+				<div id="talk_member"></div>
+			</li>
+		</ul>
+		<div class="align-center">
+			<input type="submit" value="전송">
+			<input type="button" value="목록" onclick="location.href='talklist'">
+		</div>
+	</form>
+</div>
+</body>
+</html>

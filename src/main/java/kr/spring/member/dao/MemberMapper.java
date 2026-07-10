@@ -40,4 +40,8 @@ public interface MemberMapper {
 	@Update("update spmember set authority=#{authority} where mem_num=#{mem_num}")
 	public void updateByAdmin(MemberVO memberVO);
 	
+	//채팅 회원이름 검색
+	@Select("select mem_num, id, nick_name from spmember where (authority='ROLE_USER' or authority='ROLE_ADMIN') and id like '%' || #{id} || '%'")
+	public List<MemberVO> selectSearchMember(String id);
+	
 }
